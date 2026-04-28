@@ -33,26 +33,27 @@ module testbenchActividad3;
     );
         logic [M:0] a_ext, b_ext;
         logic [M:0] add_ext;
-        logic [M:0] borrow_ext;
+        logic [M:0] sub_ext;
         logic [M-1:0] r_pow;
     begin
         a_ext = {1'b0, a_i};
         b_ext = {1'b0, b_i};
         add_ext = a_ext + b_ext;
-        borrow_ext = {1'b0, ~a_i} + {1'b0, b_i}; // Igual a implementación DUT
+        sub_ext = a_ext - b_ext;
+        f_o = '0;
 
         unique case (op_i)
             2'd0: begin r_o = a_i & b_i; f_o[1] = 1'b0; end
             2'd1: begin r_o = a_i | b_i; f_o[1] = 1'b0; end
             2'd2: begin r_o = add_ext[M-1:0]; f_o[1] = add_ext[M]; end
-            2'd3: begin r_o = a_i - b_i; f_o[1] = borrow_ext[M]; end
+            2'd3: begin r_o = sub_ext[M-1:0]; f_o[1] = sub_ext[M]; end
             default: begin r_o = '0; f_o[1] = 1'b0; end
         endcase
 
         // V flag según implementación del DUT
-        if ((op_i == 2'd2) && (a_i[M-1] == b_i[M-1]) && (add_ext[M-1] != a_i[M-1]))
+        if ((op_i == 2'd2) && (a_i[M-1] == b_i[M-1]) && (r_o[M-1] != a_i[M-1]))
             f_o[0] = 1'b1;
-        else if ((op_i == 2'd3) && (a_i[M-1] != b_i[M-1]) && (add_ext[M-1] != a_i[M-1]))
+        else if ((op_i == 2'd3) && (a_i[M-1] != b_i[M-1]) && (r_o[M-1] != a_i[M-1]))
             f_o[0] = 1'b1;
         else
             f_o[0] = 1'b0;
